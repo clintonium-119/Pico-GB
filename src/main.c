@@ -70,10 +70,10 @@
 #define GPIO_DOWN	23
 #define GPIO_LEFT	20
 #define GPIO_RIGHT	22
-#define GPIO_A		0
-#define GPIO_B		10
-#define GPIO_SELECT	1
-#define GPIO_START	8
+#define GPIO_A		28
+#define GPIO_B		29
+#define GPIO_SELECT	27
+#define GPIO_START	26
 #define GPIO_CS		5
 #define GPIO_CLK	6
 #define GPIO_SDA	7

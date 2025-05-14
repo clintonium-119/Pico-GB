@@ -29,10 +29,10 @@
  */
 i2s_config_t i2s_get_default_config(void) {
     i2s_config_t i2s_config = {
-		.sample_freq = 44100, 
+		.sample_freq = 44100,
 		.channel_count = 2,
-		.data_pin = 26,
-		.clock_pin_base = 27,
+		.data_pin = 10,
+		.clock_pin_base = 0,
 		.pio = pio0,
 		.sm = 0,
         .dma_channel = 0,
@@ -53,13 +53,13 @@ void i2s_init(i2s_config_t *i2s_config) {
     gpio_set_function(i2s_config->data_pin, GPIO_FUNC_PIO0);
     gpio_set_function(i2s_config->clock_pin_base, GPIO_FUNC_PIO0);
     gpio_set_function(i2s_config->clock_pin_base+1, GPIO_FUNC_PIO0);
-    
+
     i2s_config->sm = pio_claim_unused_sm(i2s_config->pio, true);
-    
+
     uint offset = pio_add_program(i2s_config->pio, &audio_i2s_program);
 
     audio_i2s_program_init(i2s_config->pio, i2s_config->sm , offset, i2s_config->data_pin , i2s_config->clock_pin_base);
-    
+
     /* Set PIO clock */
     uint32_t system_clock_frequency = clock_get_hz(clk_sys);
     uint32_t divider = system_clock_frequency * 4 / i2s_config->sample_freq; // avoid arithmetic overflow
@@ -72,7 +72,7 @@ void i2s_init(i2s_config_t *i2s_config) {
 
     /* Direct Memory Access setup */
     i2s_config->dma_channel = dma_claim_unused_channel(true);
-    
+
     dma_channel_config dma_config = dma_channel_get_default_config(i2s_config->dma_channel);
     channel_config_set_read_increment(&dma_config, true);
     channel_config_set_write_increment(&dma_config, false);
@@ -93,7 +93,7 @@ void i2s_init(i2s_config_t *i2s_config) {
  * Write samples to I2S directly and wait for completion (blocking)
  * i2s_config: I2S context obtained by i2s_get_default_config()
  *     sample: pointer to an array of len x 32 bits samples
- *             Each 32 bits sample contains 2x16 bits samples, 
+ *             Each 32 bits sample contains 2x16 bits samples,
  *             one for the left channel and one for the right channel
  *        len: length of sample in 32 bits words
  */
@@ -119,7 +119,7 @@ void i2s_dma_write(i2s_config_t *i2s_config,const int16_t *samples) {
             i2s_config->dma_buf[i] = samples[i]>>i2s_config->volume;
         }
     }
-    
+
     /* Initiate the DMA transfer */
     dma_channel_transfer_from_buffer_now(i2s_config->dma_channel,
                                          i2s_config->dma_buf,

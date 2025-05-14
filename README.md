@@ -37,10 +37,10 @@ DISCLAIMER: Some links are affiliate links. As an Amazon Associate I receive a s
 * DOWN = GP23
 * LEFT = GP20
 * RIGHT = GP22
-* BUTTON A = GP0
-* BUTTON B = GP10
-* SELECT = GP1
-* START = GP8
+* BUTTON A = GP28
+* BUTTON B = GP29
+* SELECT = GP27
+* START = GP26
 * SD MISO = GP12
 * SD CS = GP13
 * SD CSK = GP14
@@ -51,9 +51,9 @@ DISCLAIMER: Some links are affiliate links. As an Amazon Associate I receive a s
 * LCD RS = GP3
 * LCD RST = GP2
 * LCD LED = GP4
-* MAX98357A DIN = GP26
-* MAX98357A BCLK = GP27
-* MAX98357A LRC = GP28
+* MAX98357A DIN = GP10
+* MAX98357A BCLK = GP0
+* MAX98357A LRC = GP1
 
 # Flashing the firmware
 * Download RP2040_GB.uf2 from the [releases page](https://github.com/YouMakeTech/Pico-GB/releases)
