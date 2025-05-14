@@ -1,9 +1,9 @@
 /**
  * Copyright (C) 2022 by Mahyar Koshkouei <mk@deltabeard.com>
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
  * REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
  * AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
@@ -66,20 +66,20 @@
 #include "gbcolors.h"
 
 /* GPIO Connections. */
-#define GPIO_UP		2
-#define GPIO_DOWN	3
-#define GPIO_LEFT	4
-#define GPIO_RIGHT	5
-#define GPIO_A		6
-#define GPIO_B		7
-#define GPIO_SELECT	8
-#define GPIO_START	9
-#define GPIO_CS		17
-#define GPIO_CLK	18
-#define GPIO_SDA	19
-#define GPIO_RS		20
-#define GPIO_RST	21
-#define GPIO_LED	22
+#define GPIO_UP		21
+#define GPIO_DOWN	23
+#define GPIO_LEFT	20
+#define GPIO_RIGHT	22
+#define GPIO_A		0
+#define GPIO_B		10
+#define GPIO_SELECT	1
+#define GPIO_START	8
+#define GPIO_CS		5
+#define GPIO_CLK	6
+#define GPIO_SDA	7
+#define GPIO_RS		3
+#define GPIO_RST	2
+#define GPIO_LED	4
 
 #if ENABLE_SOUND
 /**
@@ -220,7 +220,7 @@ void gb_error(struct gb_s *gb, const enum gb_error_e gb_err, const uint16_t addr
 #endif
 }
 
-#if ENABLE_LCD 
+#if ENABLE_LCD
 void core1_lcd_draw_line(const uint_fast8_t line)
 {
 	static uint16_t fb[LCD_WIDTH];
@@ -288,7 +288,7 @@ void lcd_draw_line(struct gb_s *gb, const uint8_t pixels[LCD_WIDTH],
 		tight_loop_contents();
 
 	memcpy(pixels_buffer, pixels, LCD_WIDTH);
-	
+
 	/* Populate command. */
 	cmd.cmd = CORE_CMD_LCD_LINE;
 	cmd.data = line;
@@ -306,7 +306,7 @@ void read_cart_ram_file(struct gb_s *gb) {
 	char filename[16];
 	uint_fast32_t save_size;
 	UINT br;
-	
+
 	gb_get_rom_name(gb,filename);
 	save_size=gb_get_save_size(gb);
 	if(save_size>0) {
@@ -324,7 +324,7 @@ void read_cart_ram_file(struct gb_s *gb) {
 		} else {
 			printf("E f_open(%s) error: %s (%d)\n",filename,FRESULT_str(fr),fr);
 		}
-		
+
 		fr=f_close(&fil);
 		if(fr!=FR_OK) {
 			printf("E f_close error: %s (%d)\n", FRESULT_str(fr), fr);
@@ -341,7 +341,7 @@ void write_cart_ram_file(struct gb_s *gb) {
 	char filename[16];
 	uint_fast32_t save_size;
 	UINT bw;
-	
+
 	gb_get_rom_name(gb,filename);
 	save_size=gb_get_save_size(gb);
 	if(save_size>0) {
@@ -359,7 +359,7 @@ void write_cart_ram_file(struct gb_s *gb) {
 		} else {
 			printf("E f_open(%s) error: %s (%d)\n",filename,FRESULT_str(fr),fr);
 		}
-		
+
 		fr=f_close(&fil);
 		if(fr!=FR_OK) {
 			printf("E f_close error: %s (%d)\n", FRESULT_str(fr), fr);
@@ -370,8 +370,8 @@ void write_cart_ram_file(struct gb_s *gb) {
 }
 
 /**
- * Load a .gb rom file in flash from the SD card 
- */ 
+ * Load a .gb rom file in flash from the SD card
+ */
 void load_cart_rom_file(char *filename) {
 	UINT br;
 	uint8_t buffer[FLASH_SECTOR_SIZE];
@@ -394,7 +394,7 @@ void load_cart_rom_file(char *filename) {
 			flash_range_erase(flash_target_offset,FLASH_SECTOR_SIZE);
 			printf("I Programming target region...\n");
 			flash_range_program(flash_target_offset,buffer,FLASH_SECTOR_SIZE);
-			
+
 			/* Read back target region and check programming */
 			printf("I Done. Reading back target region...\n");
 			for(uint32_t i=0;i<FLASH_SECTOR_SIZE;i++) {
@@ -414,7 +414,7 @@ void load_cart_rom_file(char *filename) {
 	} else {
 		printf("E f_open(%s) error: %s (%d)\n",filename,FRESULT_str(fr),fr);
 	}
-	
+
 	fr=f_close(&fil);
 	if(fr!=FR_OK) {
 		printf("E f_close error: %s (%d)\n", FRESULT_str(fr), fr);
@@ -483,7 +483,7 @@ void rom_file_selector() {
     uint16_t num_page;
 	char filename[22][256];
 	uint16_t num_file;
-	
+
 	/* display the first page with up to 22 rom files */
 	num_file=rom_file_selector_display_page(filename,num_page);
 
@@ -563,7 +563,7 @@ int main(void)
 {
 	static struct gb_s gb;
 	enum gb_init_error_e ret;
-	
+
 	/* Overclock. */
 	{
 		const unsigned vco = 1596*1000*1000;	/* 266MHz */
@@ -611,7 +611,7 @@ int main(void)
 	gpio_set_dir(GPIO_LED, true);
 	gpio_set_slew_rate(GPIO_CLK, GPIO_SLEW_RATE_FAST);
 	gpio_set_slew_rate(GPIO_SDA, GPIO_SLEW_RATE_FAST);
-	
+
 	gpio_pull_up(GPIO_UP);
 	gpio_pull_up(GPIO_DOWN);
 	gpio_pull_up(GPIO_LEFT);
@@ -633,7 +633,7 @@ int main(void)
 	stream=malloc(AUDIO_BUFFER_SIZE_BYTES);
     assert(stream!=NULL);
     memset(stream,0,AUDIO_BUFFER_SIZE_BYTES);  // Zero out the stream buffer
-	
+
 	// Initialize I2S sound driver
 	i2s_config_t i2s_config = i2s_get_default_config();
 	i2s_config.sample_freq=AUDIO_SAMPLE_RATE;
@@ -668,21 +668,21 @@ while(true)
 	/* Automatically assign a colour palette to the game */
 	char rom_title[16];
 	auto_assign_palette(palette, gb_colour_hash(&gb),gb_get_rom_name(&gb,rom_title));
-	
+
 #if ENABLE_LCD
 	gb_init_lcd(&gb, &lcd_draw_line);
 
 	/* Start Core1, which processes requests to the LCD. */
 	putstdio("CORE1 ");
 	multicore_launch_core1(main_core1);
-	
+
 	putstdio("LCD ");
 #endif
 
 #if ENABLE_SOUND
 	// Initialize audio emulation
 	audio_init();
-	
+
 	putstdio("AUDIO ");
 #endif
 
@@ -748,7 +748,7 @@ while(true)
 				if(manual_palette_selected<12) {
 					manual_palette_selected++;
 					manual_assign_palette(palette,manual_palette_selected);
-				}	
+				}
 			}
 			if(!gb.direct.joypad_bits.left && prev_joypad_bits.left) {
 				/* select + left: select the previous manual color palette */
@@ -759,9 +759,9 @@ while(true)
 			}
 			if(!gb.direct.joypad_bits.start && prev_joypad_bits.start) {
 				/* select + start: save ram and resets to the game selection menu */
-#if ENABLE_SDCARD				
+#if ENABLE_SDCARD
 				write_cart_ram_file(&gb);
-#endif				
+#endif
 				goto out;
 			}
 			if(!gb.direct.joypad_bits.a && prev_joypad_bits.a) {
@@ -771,7 +771,7 @@ while(true)
 			}
 		}
 
-		/* Serial monitor commands */ 
+		/* Serial monitor commands */
 		input = getchar_timeout_us(0);
 		if(input == PICO_ERROR_TIMEOUT)
 			continue;
@@ -895,7 +895,7 @@ while(true)
 out:
 	puts("\nEmulation Ended");
 	/* stop lcd task running on core 1 */
-	multicore_reset_core1(); 
+	multicore_reset_core1();
 
 }
 
